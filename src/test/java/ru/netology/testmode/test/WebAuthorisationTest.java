@@ -10,6 +10,7 @@ import java.time.Duration;
 
 import static com.codeborne.selenide.Selenide.*;
 import static ru.netology.testmode.data.DataGenerator.Registration.getRegisteredUser;
+import static ru.netology.testmode.data.DataGenerator.Registration.getUser;
 
 public class WebAuthorisationTest {
 
@@ -30,22 +31,27 @@ public class WebAuthorisationTest {
         $("h2").shouldBe(Condition.appear, Duration.ofSeconds(15)).shouldHave(Condition.ownText("Личный кабинет"));
     }
 
+    @Test
+    @DisplayName("Should get error message if login with not registered user")
+    void shouldGetErrorIfNotRegisteredUser() {
+        var notRegisteredUser = getUser("active");
+        $("[data-test-id='login'] input").setValue(notRegisteredUser.getLogin());
+        $("[data-test-id='password'] input").setValue(notRegisteredUser.getPassword());
+        $$("button").find(Condition.exactText("Продолжить")).click();
+        $("[data-test-id='error-notification']").shouldBe(Condition.appear, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.ownText("Неверно указан логин или пароль"));
+    }
 
-//    @Test
-//    @DisplayName("Should get error message if login with not registered user")
-//    void shouldGetErrorIfNotRegisteredUser() {
-//        var notRegisteredUser = getUser("active");
-//        // TODO: добавить логику теста в рамках которого будет выполнена попытка входа в личный кабинет
-//        //  незарегистрированного пользователя, для заполнения полей формы используйте пользователя notRegisteredUser
-//    }
-//
-//    @Test
-//    @DisplayName("Should get error message if login with blocked registered user")
-//    void shouldGetErrorIfBlockedUser() {
-//        var blockedUser = getRegisteredUser("blocked");
-//        // TODO: добавить логику теста в рамках которого будет выполнена попытка входа в личный кабинет,
-//        //  заблокированного пользователя, для заполнения полей формы используйте пользователя blockedUser
-//    }
+    @Test
+    @DisplayName("Should get error message if login with blocked registered user")
+    void shouldGetErrorIfBlockedUser() {
+        var blockedUser = getRegisteredUser("blocked");
+        $("[data-test-id='login'] input").setValue(blockedUser.getLogin());
+        $("[data-test-id='password'] input").setValue(blockedUser.getPassword());
+        $$("button").find(Condition.exactText("Продолжить")).click();
+        $("[data-test-id='error-notification']").shouldBe(Condition.appear, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.ownText("Пользователь заблокирован"));
+    }
 //
 //    @Test
 //    @DisplayName("Should get error message if login with wrong login")
