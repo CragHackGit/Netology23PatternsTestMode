@@ -11,6 +11,8 @@ import java.time.Duration;
 import static com.codeborne.selenide.Selenide.*;
 import static ru.netology.testmode.data.DataGenerator.Registration.getRegisteredUser;
 import static ru.netology.testmode.data.DataGenerator.Registration.getUser;
+import static ru.netology.testmode.data.DataGenerator.getRandomLogin;
+import static ru.netology.testmode.data.DataGenerator.getRandomPassword;
 
 public class WebAuthorisationTest {
 
@@ -52,24 +54,28 @@ public class WebAuthorisationTest {
         $("[data-test-id='error-notification']").shouldBe(Condition.appear, Duration.ofSeconds(15));
         $(".notification__content").shouldHave(Condition.ownText("Пользователь заблокирован"));
     }
-//
-//    @Test
-//    @DisplayName("Should get error message if login with wrong login")
-//    void shouldGetErrorIfWrongLogin() {
-//        var registeredUser = getRegisteredUser("active");
-//        var wrongLogin = getRandomLogin();
-//        // TODO: добавить логику теста в рамках которого будет выполнена попытка входа в личный кабинет с неверным
-//        //  логином, для заполнения поля формы "Логин" используйте переменную wrongLogin,
-//        //  "Пароль" - пользователя registeredUser
-//    }
-//
-//    @Test
-//    @DisplayName("Should get error message if login with wrong password")
-//    void shouldGetErrorIfWrongPassword() {
-//        var registeredUser = getRegisteredUser("active");
-//        var wrongPassword = getRandomPassword();
-//        // TODO: добавить логику теста в рамках которого будет выполнена попытка входа в личный кабинет с неверным
-//        //  паролем, для заполнения поля формы "Логин" используйте пользователя registeredUser,
-//        //  "Пароль" - переменную wrongPassword
-//    }
+
+    @Test
+    @DisplayName("Should get error message if login with wrong login")
+    void shouldGetErrorIfWrongLogin() {
+        var registeredUser = getRegisteredUser("active");
+        var wrongLogin = getRandomLogin();
+        $("[data-test-id='login'] input").setValue(wrongLogin);
+        $("[data-test-id='password'] input").setValue(registeredUser.getPassword());
+        $$("button").find(Condition.exactText("Продолжить")).click();
+        $("[data-test-id='error-notification']").shouldBe(Condition.appear, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.ownText("Неверно указан логин или пароль"));
+    }
+
+    @Test
+    @DisplayName("Should get error message if login with wrong password")
+    void shouldGetErrorIfWrongPassword() {
+        var registeredUser = getRegisteredUser("active");
+        var wrongPassword = getRandomPassword();
+        $("[data-test-id='login'] input").setValue(registeredUser.getLogin());
+        $("[data-test-id='password'] input").setValue(wrongPassword);
+        $$("button").find(Condition.exactText("Продолжить")).click();
+        $("[data-test-id='error-notification']").shouldBe(Condition.appear, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.ownText("Неверно указан логин или пароль"));
+    }
 }
